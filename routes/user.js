@@ -1,7 +1,7 @@
 // For providing Routing to App
 const express = require('express')
 const router = express.Router()
-const { signup } = require('../controllers/user')
+const { signup, signin, signout, requireSignin } = require('../controllers/user')
 const { body } = require('express-validator');
 
 router.post('/signup', [
@@ -20,5 +20,13 @@ router.post('/signup', [
         .matches(/\d/)
         .withMessage("Password must also contain a number!")
 ], signup)
+
+router.post('/signin', signin)
+router.get('/signout', signout)
+
+router.get('/hello', requireSignin, (req, res) => {
+    res.send('Hello there!')
+})
+
 
 module.exports = router
