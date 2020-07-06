@@ -1,32 +1,16 @@
-// For providing Routing to App
+// Routes for User Authentication
 const express = require('express')
 const router = express.Router()
-const { signup, signin, signout, requireSignin } = require('../controllers/user')
-const { body } = require('express-validator');
+const { userById } = require('../controllers/user')
+const { requireSignin, isAuth, isAdmin } = require('../controllers/auth')
 
-router.post('/signup', [
-    body("name", "Name is required!").notEmpty(),
-    body("email", "Email is required!").notEmpty()
-        .matches(/.+\@.+\..+/)
-        .withMessage("Email must contain @ character!")
-        .isLength({
-            min: 4,
-            max: 32
-        }),
-    body("password", "Password is required!").notEmpty(),
-    body("password")
-        .isLength({ min: 6 })
-        .withMessage("Password must contain at least 6 characters long!")
-        .matches(/\d/)
-        .withMessage("Password must also contain a number!")
-], signup)
-
-router.post('/signin', signin)
-router.get('/signout', signout)
-
-router.get('/hello', requireSignin, (req, res) => {
-    res.send('Hello there!')
+router.get('/secret/:userId', requireSignin, isAuth, isAdmin, (req, res) => {
+  res.send({
+    user: req.profile
+  })
 })
+
+router.param('userId', userById)
 
 
 module.exports = router
